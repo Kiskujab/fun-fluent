@@ -1,0 +1,17 @@
+{
+  "name": "GrammarPeak — Climb from B2 to C2",
+  "short_name": "GrammarPeak",
+  "description": "A fun, interactive climb from B2 to C2 English grammar. 9 modules, 37 lessons, 1,638 exercises.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fdf9f1",
+  "theme_color": "#6c5ce7",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

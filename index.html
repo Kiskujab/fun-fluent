@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GrammarPeak — Climb from B2 to C2</title>
+    <meta name="description" content="A fun, interactive climb from B2 to C2 English grammar. 9 modules, 37 lessons, 1,638 exercises — learn, practise, beat the boss." />
+    <meta name="theme-color" content="#fdf9f1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="GrammarPeak — Climb from B2 to C2" />
+    <meta property="og:description" content="A fun, interactive climb from B2 to C2 English grammar. 9 modules, 37 lessons, 1,638 exercises." />
+    <meta property="og:image" content="/favicon.svg" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400..1000;1,400..1000&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Pre-hydration splash — disappears as soon as React mounts. */
+      #root:empty::before {
+        content: '⛰️';
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        background: #fdf9f1;
+        animation: splash-pulse 1.1s ease-in-out infinite;
+      }
+      @keyframes splash-pulse {
+        0%,
+        100% {
+          opacity: 0.55;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <p style="font-family: system-ui; padding: 2rem; text-align: center">
+        GrammarPeak needs JavaScript to run — please enable it and reload. ⛰️
+      </p>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
