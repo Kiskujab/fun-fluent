@@ -1,13 +1,36 @@
 import { useState } from 'react';
 import { useProgress } from '../state/store';
-import { BADGES } from '../state/gamification';
+import { BADGES, LEVELS, levelForXp } from '../state/gamification';
+import { MODULES } from '../curriculum';
+
+const DEV_CODE = 'Fejlesztek2026';
+const ALL_LESSON_IDS = MODULES.flatMap((m) => m.lessons.filter((l) => l.available).map((l) => l.id));
+const ALL_BADGE_IDS = BADGES.map((b) => b.id);
+const MAX_XP = LEVELS[LEVELS.length - 1].xp;
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { state, toggleSound, resetAll, exportJson, importJson } = useProgress();
+  const { state, toggleSound, resetAll, exportJson, importJson, setDevMode, devSetXp, devCompleteAll, devGrantBadges } =
+    useProgress();
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState('');
   const [note, setNote] = useState('');
   const [confirmReset, setConfirmReset] = useState(false);
+  const [devOpen, setDevOpen] = useState(false);
+  const [devCode, setDevCode] = useState('');
+  const [devErr, setDevErr] = useState('');
+  const [xpInput, setXpInput] = useState('');
+
+  const unlockDev = () => {
+    if (devCode === DEV_CODE) {
+      setDevMode(true);
+      setDevErr('');
+      setDevCode('');
+      setDevOpen(false);
+      setNote('🛠 Developer mode unlocked!');
+    } else {
+      setDevErr('❌ Wrong code.');
+    }
+  };
 
   const doExport = async () => {
     const json = exportJson();
@@ -119,6 +142,133 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             Reset all progress
           </button>
         )}
+
+        {/* ---------- Developer mode ---------- */}
+        <div className="mt-5 border-t-2 border-[#f0e9dc] pt-4">
+          {state.devMode ? (
+            <div className="rounded-2xl border-2 border-brand/40 bg-brand/5 p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="font-black text-brand-deep">🛠 Developer mode</p>
+                <span className="rounded-full bg-good/15 px-2 py-0.5 text-xs font-black text-good-deep">ON</span>
+              </div>
+              <p className="mb-3 text-xs font-bold text-ink-soft">
+                Every module is unlocked. Give yourself XP, stars and badges to test anything.
+              </p>
+
+              {/* XP tools */}
+              <p className="mb-1 text-xs font-black tracking-widest text-ink-soft uppercase">
+                XP · Level {levelForXp(state.xp) + 1} ({LEVELS[levelForXp(state.xp)].name})
+              </p>
+              <div className="mb-2 flex gap-2">
+                <input
+                  value={xpInput}
+                  onChange={(e) => setXpInput(e.target.value.replace(/[^0-9]/g, ''))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && xpInput !== '') {
+                      devSetXp(Number(xpInput));
+                      setNote(`⚡ XP set to ${Number(xpInput).toLocaleString('en-GB')}.`);
+                      setXpInput('');
+                    }
+                  }}
+                  inputMode="numeric"
+                  placeholder="set XP…"
+                  className="w-24 rounded-xl border-2 border-brand/30 bg-white px-3 py-2 text-sm font-extrabold outline-none focus:border-brand"
+                />
+                <button
+                  onClick={() => {
+                    if (xpInput !== '') {
+                      devSetXp(Number(xpInput));
+                      setNote(`⚡ XP set to ${Number(xpInput).toLocaleString('en-GB')}.`);
+                      setXpInput('');
+                    }
+                  }}
+                  className="btn-3d btn-brand px-4 py-2 text-sm"
+                >
+                  Set
+                </button>
+                <button
+                  onClick={() => {
+                    devSetXp(state.xp + 500);
+                    setNote('⚡ +500 XP.');
+                  }}
+                  className="btn-3d btn-white px-3 py-2 text-sm"
+                >
+                  +500
+                </button>
+                <button
+                  onClick={() => {
+                    devSetXp(MAX_XP);
+                    setNote('👑 Maxed out — C2 Grandmaster.');
+                  }}
+                  className="btn-3d btn-white px-3 py-2 text-sm"
+                >
+                  Max
+                </button>
+              </div>
+
+              {/* One-tap testing helpers */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    devCompleteAll(ALL_LESSON_IDS);
+                    setNote('✅ All lessons completed with 3 stars.');
+                  }}
+                  className="btn-3d btn-white px-3 py-2.5 text-sm"
+                >
+                  ⭐ Complete all
+                </button>
+                <button
+                  onClick={() => {
+                    devGrantBadges(ALL_BADGE_IDS);
+                    setNote('🏅 All badges granted.');
+                  }}
+                  className="btn-3d btn-white px-3 py-2.5 text-sm"
+                >
+                  🏅 All badges
+                </button>
+              </div>
+
+              <button
+                onClick={() => {
+                  setDevMode(false);
+                  setNote('Developer mode turned off.');
+                }}
+                className="mt-3 w-full text-sm font-bold text-bad underline"
+              >
+                Exit developer mode
+              </button>
+            </div>
+          ) : devOpen ? (
+            <div>
+              <p className="mb-2 text-xs font-black tracking-widest text-ink-soft uppercase">🛠 Developer access</p>
+              <div className="flex gap-2">
+                <input
+                  value={devCode}
+                  onChange={(e) => {
+                    setDevCode(e.target.value);
+                    setDevErr('');
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && unlockDev()}
+                  type="password"
+                  placeholder="Enter code…"
+                  autoFocus
+                  className="flex-1 rounded-xl border-2 border-[#f0e9dc] bg-sky-soft/40 px-3 py-2 text-sm font-extrabold outline-none focus:border-brand focus:bg-white"
+                />
+                <button onClick={unlockDev} className="btn-3d btn-brand px-4 py-2" disabled={devCode === ''}>
+                  Unlock
+                </button>
+              </div>
+              {devErr && <p className="mt-1.5 text-sm font-bold text-bad">{devErr}</p>}
+            </div>
+          ) : (
+            <button
+              onClick={() => setDevOpen(true)}
+              className="w-full text-center text-xs font-bold text-ink-soft/70 hover:text-brand"
+            >
+              🛠 Developer access
+            </button>
+          )}
+        </div>
 
         <p className="mt-4 text-center text-xs font-semibold text-ink-soft">
           Grammar syllabus inspired by <em>English File</em> (Oxford University Press).

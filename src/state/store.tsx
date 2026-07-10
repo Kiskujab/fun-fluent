@@ -26,6 +26,7 @@ function freshState(): ProgressState {
     streak: { current: 0, best: 0, lastDate: '' },
     badges: [],
     soundOn: true,
+    devMode: false,
     combo: 0,
     maxCombo: 0,
   };
@@ -73,6 +74,14 @@ interface Store {
   awardFlatXp: (amount: number) => void;
   completeLesson: (lessonId: string, bossPct: number, moduleLessonIds: string[]) => void;
   toggleSound: () => void;
+  /* ----- developer mode ----- */
+  setDevMode: (on: boolean) => void;
+  /** Set XP to an absolute value (fires level-up celebrations as usual). */
+  devSetXp: (xp: number) => void;
+  /** Mark every given lesson as complete with 3 stars. */
+  devCompleteAll: (lessonIds: string[]) => void;
+  /** Grant every given badge id. */
+  devGrantBadges: (badgeIds: string[]) => void;
   resetAll: () => void;
   exportJson: () => string;
   importJson: (raw: string) => boolean;
@@ -210,6 +219,32 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         });
       },
 
+      setDevMode(on) {
+        commit((d) => {
+          d.devMode = on;
+        });
+      },
+
+      devSetXp(xp) {
+        commit((d) => {
+          d.xp = Math.max(0, Math.round(xp));
+        });
+      },
+
+      devCompleteAll(lessonIds) {
+        commit((d) => {
+          for (const id of lessonIds) {
+            d.completed[id] = { bestBossPct: 100, stars: 3, timesCompleted: Math.max(1, d.completed[id]?.timesCompleted ?? 0) };
+          }
+        });
+      },
+
+      devGrantBadges(badgeIds) {
+        commit((d) => {
+          for (const id of badgeIds) if (!d.badges.includes(id)) d.badges.push(id);
+        });
+      },
+
       resetAll() {
         stateRef.current = freshState();
         setState(freshState());
@@ -234,6 +269,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
             streak: { ...freshState().streak, ...(parsed.streak ?? {}) },
             badges: Array.isArray(parsed.badges) ? parsed.badges : [],
             soundOn: parsed.soundOn !== false,
+            devMode: parsed.devMode === true,
           };
           stateRef.current = next;
           setState(next);

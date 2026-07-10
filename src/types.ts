@@ -152,6 +152,8 @@ export interface ProgressState {
   streak: { current: number; best: number; lastDate: string };
   badges: string[];
   soundOn: boolean;
+  /** Developer mode: unlocks every lesson and reveals the testing tools. */
+  devMode: boolean;
   /** Transient, not persisted. */
   combo: number;
   maxCombo: number;

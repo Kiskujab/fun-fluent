@@ -32,7 +32,8 @@ function useUnlocks() {
         const l = mod.lessons[i];
         if (!l.available) continue;
         const prev = contentful[contentful.indexOf(l) - 1];
-        if ((prevModuleDone && !prev) || (prev && state.completed[prev.id])) unlocked.add(l.id);
+        // Developer mode unlocks every lesson so anything can be tested.
+        if (state.devMode || (prevModuleDone && !prev) || (prev && state.completed[prev.id])) unlocked.add(l.id);
       }
       prevModuleDone = contentful.length > 0 && contentful.every((l) => state.completed[l.id]);
     }
@@ -48,7 +49,7 @@ function useUnlocks() {
       if (current) break;
     }
     return { unlocked, current };
-  }, [state.completed]);
+  }, [state.completed, state.devMode]);
 }
 
 function ModuleZone({

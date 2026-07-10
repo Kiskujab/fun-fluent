@@ -42,6 +42,14 @@ export function Header({ onSettings }: { onSettings: () => void }) {
               <span className="block h-full rounded-full bg-brand" style={{ width: `${prog * 100}%` }} />
             </span>
           </div>
+          {state.devMode && (
+            <span
+              className="rounded-full bg-brand/15 px-2 py-1 text-xs font-black text-brand-deep"
+              title="Developer mode is on — every lesson is unlocked"
+            >
+              🛠 DEV
+            </span>
+          )}
           <button
             onClick={onSettings}
             aria-label="Settings"
